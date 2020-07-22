@@ -15,8 +15,6 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
-        # * RAM is cleared to `0`.
-        self.ram = [0] * 256 
         # +-----------------------+
         # | FF  I7 vector         |    Interrupt vector table
         # | FE  I6 vector         |
@@ -36,13 +34,15 @@ class CPU:
         # | 01  [more program]    |
         # | 00  Program entry     |    Program loaded upward in memory starting at 0
         # +-----------------------+
+        # * RAM is cleared to `0`.
+        self.ram = [0] * 256 
         # * `R0`-`R6` are cleared to `0`.
-        self.reg = [0] * 8
-        # * `R7` is set to `0xF4`.
-        self.reg[7] = 244
         #R5 is reserved as the interrupt mask (IM)
         #R6 is reserved as the interrupt status (IS)
         #R7 is reserved as the stack pointer (SP)
+        self.reg = [0] * 8
+        # * `R7` is set to `0xF4`.
+        self.reg[7] = 244
         # `PC`: Program Counter, address of the currently executing instruction
         # * `PC` and `FL` registers are cleared to `0`.
         self.pc = 0
