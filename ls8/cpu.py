@@ -135,6 +135,28 @@ class CPU:
     def prn(self, reg_num):
         print(self.reg[reg_num])
 
+    def push(self, reg_num):
+        # decrement the stack pointer
+        self.reg[7] -= 1
+
+        # get a value from the given register
+        value = self.reg[reg_num]
+
+        # put the value at the stack pointer address
+        sp = self.reg[7]
+        self.ram[sp] = value
+
+    def pop(self, operand_a):
+        # get the stack pointer (where do we look?)
+        sp = self.reg[7]
+
+        # use stack pointer to get the value
+        value = self.ram[sp]
+        # put the value into the given register
+        self.reg[operand_a] = value
+        # increment our stack pointer
+        self.reg[7] += 1
+
     def run(self):
         """Run the CPU."""
         # * `IR`: Instruction Register, contains a copy of the currently executing instruction
@@ -162,29 +184,10 @@ class CPU:
                 self.prn(operand_a)
                 self.pc +=1
             elif ir == PUSH:
-                # decrement the stack pointer
-                self.reg[7] -= 1
-
-                # get a value from the given register
-                value = self.reg[operand_a]
-
-                # put the value at the stack pointer address
-                sp = self.reg[7]
-                self.ram[sp] = value
-
+                self.push(operand_a)
                 self.pc += 1
             elif ir == POP:
-                # get the stack pointer (where do we look?)
-                sp = self.reg[7]
-
-                # use stack pointer to get the value
-                value = self.ram[sp]
-                # put the value into the given register
-                self.reg[operand_a] = value
-                # increment our stack pointer
-                self.reg[7] += 1
-
-                # increment our program counter
+                self.pop(operand_a)
                 self.pc += 1
 
             # print(self.ram)
