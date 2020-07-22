@@ -7,6 +7,8 @@ LDI = 10000010
 PRN = 1000111
 PUSH = 1000101 
 POP = 1000110 
+MUL = 10100010
+ADD = 10100000
 
 class CPU:
     """Main CPU class."""
@@ -164,17 +166,16 @@ class CPU:
 
         while ir != HLT:
             ir = self.ram_read(self.pc)
-            str_ir = str(ir)
             # Using ram_read(), read the bytes at PC+1 and PC+2 from RAM into variables operand_a and operand_b in case the instruction needs them.
             operand_a = self.convert(self.ram_read(self.pc+1))
             operand_b = self.convert(self.ram_read(self.pc+2))
 
-            if len(str_ir) > 6 and str_ir[-6] == "1":
-            #this is an alu operator
-                if ir == 10100010:
-                    op = "MUL"
-                elif ir == 10100000:
-                    op = "ADD"
+            if ir == MUL:
+                op = "MUL"
+                self.alu(op, operand_a, operand_b)
+                self.pc += 2
+            elif ir == ADD:
+                op = "ADD"
                 self.alu(op, operand_a, operand_b)
                 self.pc += 2
             elif ir == LDI:
