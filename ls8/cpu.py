@@ -109,7 +109,7 @@ class CPU:
 
         print()
     
-    def get_index(self, binary):
+    def convert(self, binary):
         binary_str = str(binary)
         binary_str.replace("0b", '')
         return int(binary_str, 2) 
@@ -132,8 +132,8 @@ class CPU:
             ir = self.ram_read(self.pc)
             str_ir = str(ir)
             # Using ram_read(), read the bytes at PC+1 and PC+2 from RAM into variables operand_a and operand_b in case the instruction needs them.
-            operand_a = self.get_index(self.ram_read(self.pc+1))
-            operand_b = self.get_index(self.ram_read(self.pc+2))
+            operand_a = self.convert(self.ram_read(self.pc+1))
+            operand_b = self.convert(self.ram_read(self.pc+2))
 
             if len(str_ir) > 6 and str_ir[-6] == "1":
             #this is an alu operator
