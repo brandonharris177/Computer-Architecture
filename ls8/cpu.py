@@ -2,11 +2,18 @@
 
 import sys
 
+HLT = 1
+LDI = 10000010 
+PRN = 1000111
+PUSH = 1000101 
+POP = 1000110 
+
 class CPU:
     """Main CPU class."""
 
     def __init__(self):
         """Construct a new CPU."""
+        # * RAM is cleared to `0`.
         self.ram = [0] * 256 
         # +-----------------------+
         # | FF  I7 vector         |    Interrupt vector table
@@ -27,14 +34,20 @@ class CPU:
         # | 01  [more program]    |
         # | 00  Program entry     |    Program loaded upward in memory starting at 0
         # +-----------------------+
+        # * `R0`-`R6` are cleared to `0`.
         self.reg = [0] * 8
+        # * `R7` is set to `0xF4`.
+        self.reg[7] = 244
         #R5 is reserved as the interrupt mask (IM)
         #R6 is reserved as the interrupt status (IS)
         #R7 is reserved as the stack pointer (SP)
         # `PC`: Program Counter, address of the currently executing instruction
+        # * `PC` and `FL` registers are cleared to `0`.
         self.pc = 0
         # * `FL`: Flags, see below  
         self.fl = 0  
+        # self.branchtable = {}
+
 
     # Inside the CPU, there are two internal registers used for memory operations: the Memory Address Register (MAR) and the Memory Data Register (MDR). The MAR contains the address that is being read or written to. The MDR contains the data that was read or the data to write. You don't need to add the MAR or MDR to your CPU class, but they would make handy parameter names for ram_read() and ram_write(), if you wanted.   
     # * `MAR`: Memory Address Register, holds the memory address we're reading or writing
@@ -69,10 +82,12 @@ class CPU:
                     if command == '':
                         continue
 
-                    instruction = bin(int(command))
+                    instruction = int(command)
                     self.ram[address] = instruction
 
                     address += 1
+            
+            # print(self.ram)
 
         except FileNotFoundError:
             print(f'{sys.argv[0]}: {sys.argv[1]} file was not found')
@@ -124,9 +139,6 @@ class CPU:
         """Run the CPU."""
         # * `IR`: Instruction Register, contains a copy of the currently executing instruction
         ir = self.ram_read(self.pc)
-        HLT = 1
-        LDI = 10000010 
-        PRN = 1000111
 
         while ir != HLT:
             ir = self.ram_read(self.pc)
@@ -149,5 +161,32 @@ class CPU:
             elif ir == PRN:
                 self.prn(operand_a)
                 self.pc +=1
+            elif ir == PUSH:
+                # decrement the stack pointer
+                self.reg[7] -= 1
 
+                # get a value from the given register
+                value = self.reg[operand_a]
+
+                # put the value at the stack pointer address
+                sp = self.reg[7]
+                self.ram[sp] = value
+
+                self.pc += 1
+            elif ir == POP:
+                # get the stack pointer (where do we look?)
+                sp = self.reg[7]
+
+                # use stack pointer to get the value
+                value = self.ram[sp]
+                # put the value into the given register
+                self.reg[operand_a] = value
+                # increment our stack pointer
+                self.reg[7] += 1
+
+                # increment our program counter
+                self.pc += 1
+
+            # print(self.ram)
+            # print(self.reg)
             self.pc += 1
