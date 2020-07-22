@@ -69,7 +69,7 @@ class CPU:
                     if command == '':
                         continue
 
-                    instruction = int(command)
+                    instruction = bin(int(command))
                     self.ram[address] = instruction
 
                     address += 1
