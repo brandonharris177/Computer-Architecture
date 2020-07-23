@@ -95,11 +95,9 @@ class CPU:
                         continue
 
                     instruction = int(command)
-                    self.ram[address] = instruction
+                    self.ram_write(address, instruction)
 
                     address += 1
-            
-            # print(self.ram)
 
         except FileNotFoundError:
             print(f'{sys.argv[0]}: {sys.argv[1]} file was not found')
@@ -157,14 +155,14 @@ class CPU:
         value = self.reg[reg_num]
         # put the value at the stack pointer address
         sp = self.reg[7]
-        self.ram[sp] = value
+        self.ram_write(sp, value)
         self.pc += 2
 
     def pop(self, reg_num, unused_operand):
         # get the stack pointer (where do we look?)
         sp = self.reg[7]
         # use stack pointer to get the value
-        value = self.ram[sp]
+        value = self.ram_read(sp)
         # put the value into the given register
         self.reg[reg_num] = value
         # increment our stack pointer
@@ -180,14 +178,15 @@ class CPU:
         self.reg[7] -= 1
         sp = self.reg[7]
         ### put return address on the stack
-        self.ram[sp] = return_address
+        self.ram_write(sp, return_address)
         ### then look at register, jump to that address
         self.pc = address
 
     def return_from_call(self, unused_operand_1, unused_operand_2):
         # pop the return address off the stack
         sp = self.reg[7]
-        return_address = self.ram[sp]
+        return_address = self.ram_read(sp)
+        self.ram_write(sp, return_address)
         self.reg[7] += 1
         # go to return address: set the pc to return address
         self.pc = return_address
