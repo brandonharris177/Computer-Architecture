@@ -100,13 +100,12 @@ class CPU:
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
-            self.pc += 2
         #elif op == "SUB": etc
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
-            self.pc += 2
         else:
             raise Exception("Unsupported ALU operation")
+        self.pc += 3
 
     def trace(self):
         """
@@ -135,11 +134,11 @@ class CPU:
 
     def ldi(self, reg_num, value):
         self.reg[reg_num] = value
-        self.pc += 2
+        self.pc += 3
 
     def prn(self, reg_num):
         print(self.reg[reg_num])
-        self.pc +=1
+        self.pc += 2
 
     def push(self, reg_num):
         # decrement the stack pointer
@@ -149,7 +148,7 @@ class CPU:
         # put the value at the stack pointer address
         sp = self.reg[7]
         self.ram[sp] = value
-        self.pc +=1
+        self.pc += 2
 
     def pop(self, operand_a):
         # get the stack pointer (where do we look?)
@@ -160,7 +159,7 @@ class CPU:
         self.reg[operand_a] = value
         # increment our stack pointer
         self.reg[7] += 1
-        self.pc +=1
+        self.pc += 2
 
     def run(self):
         """Run the CPU."""
@@ -190,4 +189,4 @@ class CPU:
 
             # print(self.ram)
             # print(self.reg)
-            self.pc += 1
+            # self.pc += 1
