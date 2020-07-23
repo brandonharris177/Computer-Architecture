@@ -104,13 +104,13 @@ class CPU:
             print(f'{sys.argv[0]}: {sys.argv[1]} file was not found')
             sys.exit()
 
-    def alu(self, reg_a, reg_b, op):
+    def alu(self, reg_a, reg_b):
         """ALU operations."""
-
-        if op == "ADD":
+        ir = self.ram_read(self.pc)
+        if ir == ADD:
             self.reg[reg_a] += self.reg[reg_b]
         #elif op == "SUB": etc
-        elif op == "MUL":
+        elif ir == MUL:
             self.reg[reg_a] *= self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
@@ -141,15 +141,15 @@ class CPU:
         binary_str.replace("0b", '')
         return int(binary_str, 2) 
 
-    def ldi(self, reg_num, value, unused_op):
+    def ldi(self, reg_num, value):
         self.reg[reg_num] = value
         self.pc += 3
 
-    def prn(self, reg_num, unused_operand, unused_op):
+    def prn(self, reg_num, unused_operand):
         print(self.reg[reg_num])
         self.pc += 2
 
-    def push(self, reg_num, unused_operand, unused_op):
+    def push(self, reg_num, unused_operand):
         # decrement the stack pointer
         self.reg[7] -= 1
         # get a value from the given register
@@ -159,7 +159,7 @@ class CPU:
         self.ram[sp] = value
         self.pc += 2
 
-    def pop(self, reg_num, unused_operand, unused_op):
+    def pop(self, reg_num, unused_operand):
         # get the stack pointer (where do we look?)
         sp = self.reg[7]
         # use stack pointer to get the value
@@ -170,7 +170,7 @@ class CPU:
         self.reg[7] += 1
         self.pc += 2
 
-    def call(self, reg_num, unused_operand, unused_op):
+    def call(self, reg_num, unused_operand):
         ### get the address to jump to, from the register
         address = self.reg[reg_num]
         ### push command after CALL onto the stack
@@ -183,7 +183,7 @@ class CPU:
         ### then look at register, jump to that address
         self.pc = address
 
-    def return_from_call(self, unused_operand_1, unused_operand_2, unused_op):
+    def return_from_call(self, unused_operand_1, unused_operand_2):
         # pop the return address off the stack
         sp = self.reg[7]
         return_address = self.ram[sp]
@@ -199,11 +199,6 @@ class CPU:
             # Using ram_read(), read the bytes at PC+1 and PC+2 from RAM into variables operand_a and operand_b in case the instruction needs them.
             operand_a = self.convert(self.ram_read(self.pc+1))
             operand_b = self.convert(self.ram_read(self.pc+2))
-            op = None
-            if ir == MUL:
-                op = "MUL"
-            elif ir == ADD:
-                op = "ADD"
 
-            self.dispach_table[ir](operand_a, operand_b, op)
+            self.dispach_table[ir](operand_a, operand_b)
             ir = self.ram_read(self.pc)
