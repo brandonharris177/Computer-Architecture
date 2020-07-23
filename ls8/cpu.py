@@ -9,6 +9,8 @@ PUSH = 1000101
 POP = 1000110 
 MUL = 10100010
 ADD = 10100000
+CALL = 1010000
+RET = 10001 
 
 class CPU:
     """Main CPU class."""
@@ -161,6 +163,27 @@ class CPU:
         self.reg[7] += 1
         self.pc += 2
 
+    def call(self, reg_num):
+        ### get the address to jump to, from the register
+        address = self.reg[reg_num]
+        ### push command after CALL onto the stack
+        return_address = self.pc+2
+        ### decrement stack pointer
+        self.reg[7] -= 1
+        sp = self.reg[7]
+        ### put return address on the stack
+        self.ram[sp] = return_address
+        ### then look at register, jump to that address
+        self.pc = address
+
+    def return_from_call(self):
+        # pop the return address off the stack
+        sp = self.reg[7]
+        return_address = self.ram[sp]
+        self.reg[7] += 1
+        # go to return address: set the pc to return address
+        self.pc = return_address
+
     def run(self):
         """Run the CPU."""
         # * `IR`: Instruction Register, contains a copy of the currently executing instruction
@@ -186,6 +209,10 @@ class CPU:
                 self.push(operand_a)
             elif ir == POP:
                 self.pop(operand_a)
+            elif ir == CALL:
+                self.call(operand_a)
+            elif ir == RET:
+                self.return_from_call()
 
             # print(self.ram)
             # print(self.reg)
