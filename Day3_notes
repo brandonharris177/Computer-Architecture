@@ -1,0 +1,62 @@
+Where to store variables if we have too many for the registers?
+stack: push, pop, storage
+RAM == memory
+registers, caches, RAM, hard drive
+memory: a way to store info and get it back
+self.ram = [0] * 256
+self.ram[256]
+FF: 00
+FE: 00
+FD: 00
+FC: 00
+FB: 00
+FA: 00
+F9: 00
+F8: 00
+F7: 00
+F6: 00
+F5: 00
+F4: 00    <-- SP
+F3: 42
+F2: 99
+F1: 99
+F0: 42
+..
+63: 00
+....
+0B: 00
+0A: 00
+09: 00
+08: 00
+06: 00
+07: 00
+06: JMP    <-- PC
+05: 00
+04: PUSH
+03: B3
+02: PRINT_NUM
+01: PRINT_TIM
+00: PRINT_TIM
+Why LS "8"?
+Why 8?
+256 bytes of memory
+00000000
+11111111
+700: 0       <-- SP
+699: 4
+698: 5
+697: 9 
+696: 14  # x 
+695: 5  # y
+694: 9  # z
+register[1] = 14
+def add(x, y):
+    z = x + y
+    return z
+def main():
+    a = 4
+    b = 5
+    c = add(4, 5)
+    d = c + b
+    return d
+main()
