@@ -50,15 +50,16 @@ class CPU:
         self.pc = 0
         # * `FL`: Flags, see below  
         self.fl = [0] * 8
-        self.dispach_table = {}
-        self.dispach_table[LDI] = self.ldi
-        self.dispach_table[PRN] = self.prn
-        self.dispach_table[PUSH] = self.push
-        self.dispach_table[POP] = self.pop
-        self.dispach_table[MUL] = self.alu
-        self.dispach_table[ADD] = self.alu
-        self.dispach_table[CALL] = self.call
-        self.dispach_table[RET] = self.return_from_call
+        self.dispach_table = {
+            LDI: self.ldi,
+            PRN: self.prn,
+            PUSH: self.push,
+            POP: self.pop,
+            MUL: self.alu,
+            ADD: self.alu,
+            CALL: self.call,
+            RET: self.return_from_call
+        }
         
     # Inside the CPU, there are two internal registers used for memory operations: the Memory Address Register (MAR) and the Memory Data Register (MDR). The MAR contains the address that is being read or written to. The MDR contains the data that was read or the data to write. You don't need to add the MAR or MDR to your CPU class, but they would make handy parameter names for ram_read() and ram_write(), if you wanted.   
     # * `MAR`: Memory Address Register, holds the memory address we're reading or writing
