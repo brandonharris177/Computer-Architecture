@@ -144,10 +144,8 @@ class CPU:
     def push(self, reg_num):
         # decrement the stack pointer
         self.reg[7] -= 1
-
         # get a value from the given register
         value = self.reg[reg_num]
-
         # put the value at the stack pointer address
         sp = self.reg[7]
         self.ram[sp] = value
