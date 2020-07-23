@@ -49,7 +49,7 @@ class CPU:
         # * `PC` and `FL` registers are cleared to `0`.
         self.pc = 0
         # * `FL`: Flags, see below  
-        self.fl = 0  
+        self.fl = [0] * 8
         # self.branchtable = {}
 
 
