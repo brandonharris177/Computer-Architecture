@@ -35,14 +35,14 @@ class CPU:
         # | 00  Program entry     |    Program loaded upward in memory starting at 0
         # +-----------------------+
         # * RAM is cleared to `0`.
-        self.ram = [0] * 256 
+        self.ram = [0] * 0xFF
         # * `R0`-`R6` are cleared to `0`.
         #R5 is reserved as the interrupt mask (IM)
         #R6 is reserved as the interrupt status (IS)
         #R7 is reserved as the stack pointer (SP)
         self.reg = [0] * 8
         # * `R7` is set to `0xF4`.
-        self.reg[7] = 244
+        self.reg[7] = 0xF4
         # `PC`: Program Counter, address of the currently executing instruction
         # * `PC` and `FL` registers are cleared to `0`.
         self.pc = 0
@@ -154,7 +154,6 @@ class CPU:
     def pop(self, operand_a):
         # get the stack pointer (where do we look?)
         sp = self.reg[7]
-
         # use stack pointer to get the value
         value = self.ram[sp]
         # put the value into the given register
