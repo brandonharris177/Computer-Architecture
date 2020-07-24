@@ -216,16 +216,16 @@ class CPU:
         self.pc = address
     
     def jump_if_equal(self, reg_num, unused_operand):
-        if self.fl[6] == 1:
+        if self.fl[7] == 1:
             self.jump(reg_num, unused_operand)
-        elif self.fl[0] == 0:
-            self.pc += 1
+        elif self.fl[7] == 0:
+            self.pc += 2
 
     def jump_not_equal(self, reg_num, unused_operand):
-        if self.fl[6] == 0:
+        if self.fl[7] == 0:
             self.jump(reg_num, unused_operand)
-        elif self.fl[0] == 1:
-            self.pc += 1
+        elif self.fl[7] == 1:
+            self.pc += 2
 
 
     def run(self):
