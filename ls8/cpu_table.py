@@ -178,7 +178,7 @@ class CPU:
         self.pc += 3
 
     def bitwise_not(self, reg_a, unused_operand):
-        self.reg[reg_a] = self.reg[reg_a] ^ 11111111
+        self.reg[reg_a] = ~self.reg[reg_a]
         self.pc += 2
 
     def bitwise_shl(self, reg_a, reg_b):
