@@ -9,6 +9,8 @@ PUSH = 1000101
 POP = 1000110 
 MUL = 10100010
 ADD = 10100000
+CALL = 1010000
+RET = 10001 
 
 class CPU:
     """Main CPU class."""
@@ -35,19 +37,19 @@ class CPU:
         # | 00  Program entry     |    Program loaded upward in memory starting at 0
         # +-----------------------+
         # * RAM is cleared to `0`.
-        self.ram = [0] * 256 
+        self.ram = [0] * 0xFF
         # * `R0`-`R6` are cleared to `0`.
         #R5 is reserved as the interrupt mask (IM)
         #R6 is reserved as the interrupt status (IS)
         #R7 is reserved as the stack pointer (SP)
         self.reg = [0] * 8
         # * `R7` is set to `0xF4`.
-        self.reg[7] = 244
+        self.reg[7] = 0xF4
         # `PC`: Program Counter, address of the currently executing instruction
         # * `PC` and `FL` registers are cleared to `0`.
         self.pc = 0
         # * `FL`: Flags, see below  
-        self.fl = 0  
+        self.fl = [0] * 8
         # self.branchtable = {}
 
 
@@ -100,13 +102,12 @@ class CPU:
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
-            self.pc += 2
         #elif op == "SUB": etc
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
-            self.pc += 2
         else:
             raise Exception("Unsupported ALU operation")
+        self.pc += 3
 
     def trace(self):
         """
@@ -135,35 +136,53 @@ class CPU:
 
     def ldi(self, reg_num, value):
         self.reg[reg_num] = value
-        self.pc += 2
+        self.pc += 3
 
     def prn(self, reg_num):
         print(self.reg[reg_num])
-        self.pc +=1
+        self.pc += 2
 
     def push(self, reg_num):
         # decrement the stack pointer
         self.reg[7] -= 1
-
         # get a value from the given register
         value = self.reg[reg_num]
-
         # put the value at the stack pointer address
         sp = self.reg[7]
         self.ram[sp] = value
-        self.pc +=1
+        self.pc += 2
 
     def pop(self, operand_a):
         # get the stack pointer (where do we look?)
         sp = self.reg[7]
-
         # use stack pointer to get the value
         value = self.ram[sp]
         # put the value into the given register
         self.reg[operand_a] = value
         # increment our stack pointer
         self.reg[7] += 1
-        self.pc +=1
+        self.pc += 2
+
+    def call(self, reg_num):
+        ### get the address to jump to, from the register
+        address = self.reg[reg_num]
+        ### push command after CALL onto the stack
+        return_address = self.pc+2
+        ### decrement stack pointer
+        self.reg[7] -= 1
+        sp = self.reg[7]
+        ### put return address on the stack
+        self.ram[sp] = return_address
+        ### then look at register, jump to that address
+        self.pc = address
+
+    def return_from_call(self):
+        # pop the return address off the stack
+        sp = self.reg[7]
+        return_address = self.ram[sp]
+        self.reg[7] += 1
+        # go to return address: set the pc to return address
+        self.pc = return_address
 
     def run(self):
         """Run the CPU."""
@@ -190,7 +209,11 @@ class CPU:
                 self.push(operand_a)
             elif ir == POP:
                 self.pop(operand_a)
+            elif ir == CALL:
+                self.call(operand_a)
+            elif ir == RET:
+                self.return_from_call()
 
             # print(self.ram)
             # print(self.reg)
-            self.pc += 1
+            # self.pc += 1
