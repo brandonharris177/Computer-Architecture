@@ -11,6 +11,7 @@ MUL = 10100010
 ADD = 10100000
 CALL = 1010000
 RET = 10001 
+CMP = 10100111
 
 class CPU:
     """Main CPU class."""
@@ -58,7 +59,8 @@ class CPU:
             MUL: self.alu,
             ADD: self.alu,
             CALL: self.call,
-            RET: self.return_from_call
+            RET: self.return_from_call,
+            CMP: self.alu
         }
         
     # Inside the CPU, there are two internal registers used for memory operations: the Memory Address Register (MAR) and the Memory Data Register (MDR). The MAR contains the address that is being read or written to. The MDR contains the data that was read or the data to write. You don't need to add the MAR or MDR to your CPU class, but they would make handy parameter names for ram_read() and ram_write(), if you wanted.   
@@ -111,6 +113,16 @@ class CPU:
         #elif op == "SUB": etc
         elif ir == MUL:
             self.reg[reg_a] *= self.reg[reg_b]
+        elif ir == CMP:
+            self.fl[5] = 0
+            self.fl[6] = 0
+            self.fl[7] = 0
+            if self.reg[reg_a] < self.reg[reg_b]:
+                self.fl[5] = 1
+            elif self.reg[reg_a] > self.reg[reg_b]:
+                self.fl[6] = 1
+            elif self.reg[reg_a] == self.reg[reg_b]:
+                self.fl[7] = 1
         else:
             raise Exception("Unsupported ALU operation")
         self.pc += 3
