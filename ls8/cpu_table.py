@@ -14,6 +14,7 @@ RET = 10001
 CMP = 10100111
 JMP = 1010100
 JEQ = 1010101
+JNE = 1010110
 
 class CPU:
     """Main CPU class."""
@@ -64,7 +65,8 @@ class CPU:
             RET: self.return_from_call,
             CMP: self.alu,
             JMP: self.jump,
-            JEQ: self.jump_if_equal
+            JEQ: self.jump_if_equal,
+            JNE: self.jump_not_equal
         }
         
     # Inside the CPU, there are two internal registers used for memory operations: the Memory Address Register (MAR) and the Memory Data Register (MDR). The MAR contains the address that is being read or written to. The MDR contains the data that was read or the data to write. You don't need to add the MAR or MDR to your CPU class, but they would make handy parameter names for ram_read() and ram_write(), if you wanted.   
@@ -217,6 +219,12 @@ class CPU:
         if self.fl[6] == 1:
             self.jump(reg_num, unused_operand)
         elif self.fl[0] == 0:
+            self.pc += 1
+
+    def jump_not_equal(self, reg_num, unused_operand):
+        if self.fl[6] == 0:
+            self.jump(reg_num, unused_operand)
+        elif self.fl[0] == 1:
             self.pc += 1
 
 
