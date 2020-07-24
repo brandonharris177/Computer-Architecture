@@ -73,12 +73,27 @@ class CPU:
             CMP: self.alu,
             JMP: self.jump,
             JEQ: self.jump_if_equal,
-            JNE: self.jump_not_equal
+            JNE: self.jump_not_equal,
+            CMP: self.alu,
+            AND: self.alu,
+            OR: self.alu,
+            XOR: self.alu,
+            NOT: self.alu,
+            SHL: self.alu,
+            SHR: self.alu,
+            MOD: self.alu
         }
         self.alu_dispach_table = {
             ADD: self.add,
             MUL: self.mul,
-            CMP: self.comp
+            CMP: self.comp,
+            AND: self.bitwise_and,
+            OR: self.bitwise_or,
+            XOR: self.bitwise_xor,
+            NOT: self.bitwise_not,
+            SHL: self.bitwise_shl,
+            SHR: self.bitwise_shr,
+            MOD: self.bitwise_mod
         }
         
     # Inside the CPU, there are two internal registers used for memory operations: the Memory Address Register (MAR) and the Memory Data Register (MDR). The MAR contains the address that is being read or written to. The MDR contains the data that was read or the data to write. You don't need to add the MAR or MDR to your CPU class, but they would make handy parameter names for ram_read() and ram_write(), if you wanted.   
@@ -95,7 +110,6 @@ class CPU:
     def ram_write(self, MAR, MDR): 
     # should accept a value to write, and the address to write it to. 
         self.ram[MAR] = MDR
-
 
     def load(self, program = None):
         """Load a program into memory."""
@@ -123,11 +137,11 @@ class CPU:
             print(f'{sys.argv[0]}: {sys.argv[1]} file was not found')
             sys.exit()
 
-    def alu(self, reg_a, reg_b):
+    def alu(self, operand_a, operand_b):
         """ALU operations."""  
         ir = self.ram_read(self.pc)
         if ir in self.alu_dispach_table:
-            self.alu_dispach_table[ir](reg_a, reg_b)
+            self.alu_dispach_table[ir](operand_a, operand_b)
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -151,7 +165,31 @@ class CPU:
             self.fl[7] = 1
         self.pc += 3
 
-    def trace(self):
+    def bitwise_and(self, reg_a, reg_b):
+        self.reg[reg_a] = self.reg[reg_a] & self.reg[reg_b]
+        self.pc += 3
+
+    def bitwise_or(self, reg_a, reg_b):
+        self.reg[reg_a] = self.reg[reg_a] | self.reg[reg_b]
+        self.pc += 3
+
+    def bitwise_xor(self, reg_a, reg_b):
+        self.reg[reg_a] = self.reg[reg_a] ^ self.reg[reg_b]
+        self.pc += 3
+
+    def bitwise_not(self, reg_a, unused_operand):
+        self.reg[reg_a] = self.reg[reg_a] ^ 11111111
+        self.pc += 2
+
+    def bitwise_shl(self, reg_a, reg_b):
+        pass
+
+    def bitwise_shr(self, reg_a, reg_b):
+        pass
+
+    def bitwise_mod(self):
+        pass
+
         """
         Handy function to print out the CPU state. You might want to call this
         from run() if you need help debugging.
