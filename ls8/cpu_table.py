@@ -15,6 +15,13 @@ CMP = 10100111
 JMP = 1010100
 JEQ = 1010101
 JNE = 1010110
+AND = 10101000
+OR = 10101010
+XOR = 10101011
+NOT = 1101001
+SHL = 10101100
+SHR = 10101101
+MOD = 10100100
 
 class CPU:
     """Main CPU class."""
@@ -116,9 +123,11 @@ class CPU:
         ir = self.ram_read(self.pc)
         if ir == ADD:
             self.reg[reg_a] += self.reg[reg_b]
+            self.pc += 3
         #elif op == "SUB": etc
         elif ir == MUL:
             self.reg[reg_a] *= self.reg[reg_b]
+            self.pc += 3
         elif ir == CMP:
             self.fl[5] = 0
             self.fl[6] = 0
@@ -129,9 +138,9 @@ class CPU:
                 self.fl[6] = 1
             elif self.reg[reg_a] == self.reg[reg_b]:
                 self.fl[7] = 1
+            self.pc += 3
         else:
             raise Exception("Unsupported ALU operation")
-        self.pc += 3
 
     def trace(self):
         """
