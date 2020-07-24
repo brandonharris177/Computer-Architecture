@@ -75,6 +75,11 @@ class CPU:
             JEQ: self.jump_if_equal,
             JNE: self.jump_not_equal
         }
+        self.alu_dispach_table = {
+            ADD: self.add,
+            MUL: self.mul,
+            CMP: self.comp
+        }
         
     # Inside the CPU, there are two internal registers used for memory operations: the Memory Address Register (MAR) and the Memory Data Register (MDR). The MAR contains the address that is being read or written to. The MDR contains the data that was read or the data to write. You don't need to add the MAR or MDR to your CPU class, but they would make handy parameter names for ram_read() and ram_write(), if you wanted.   
     # * `MAR`: Memory Address Register, holds the memory address we're reading or writing
@@ -119,28 +124,32 @@ class CPU:
             sys.exit()
 
     def alu(self, reg_a, reg_b):
-        """ALU operations."""
+        """ALU operations."""  
         ir = self.ram_read(self.pc)
-        if ir == ADD:
-            self.reg[reg_a] += self.reg[reg_b]
-            self.pc += 3
-        #elif op == "SUB": etc
-        elif ir == MUL:
-            self.reg[reg_a] *= self.reg[reg_b]
-            self.pc += 3
-        elif ir == CMP:
-            self.fl[5] = 0
-            self.fl[6] = 0
-            self.fl[7] = 0
-            if self.reg[reg_a] < self.reg[reg_b]:
-                self.fl[5] = 1
-            elif self.reg[reg_a] > self.reg[reg_b]:
-                self.fl[6] = 1
-            elif self.reg[reg_a] == self.reg[reg_b]:
-                self.fl[7] = 1
-            self.pc += 3
+        if ir in self.alu_dispach_table:
+            self.alu_dispach_table[ir](reg_a, reg_b)
         else:
             raise Exception("Unsupported ALU operation")
+
+    def add(self, reg_a, reg_b):
+        self.reg[reg_a] += self.reg[reg_b]
+        self.pc += 3
+
+    def mul(self, reg_a, reg_b):
+        self.reg[reg_a] *= self.reg[reg_b]
+        self.pc += 3
+
+    def comp(self, reg_a, reg_b):
+        self.fl[5] = 0
+        self.fl[6] = 0
+        self.fl[7] = 0
+        if self.reg[reg_a] < self.reg[reg_b]:
+            self.fl[5] = 1
+        elif self.reg[reg_a] > self.reg[reg_b]:
+            self.fl[6] = 1
+        elif self.reg[reg_a] == self.reg[reg_b]:
+            self.fl[7] = 1
+        self.pc += 3
 
     def trace(self):
         """
